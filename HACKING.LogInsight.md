@@ -47,3 +47,55 @@ metrics-net = sum
 metrics-interval = 5s
 metrics-cpu = system
 
+4 注册当前 agent 到服务器端
+    request = {
+        'request': 'register',
+        'user_key': config.user_key,
+        'name': name,
+        'hostname': hostname,
+        'system': system,
+        'distname': distname,
+        'distver': distver
+    }
+    
+    其中, 如果没有在配置文件中 设定了 name, 则 name 为 hostname 的 '.' 之前的字符串
+    如果没有 设定 hostname 则, 通过 socket.getfqdn() 得到 网络上的名称
+    在 system_detect 中
+        distname: distribution name
+        distver: distribution version
+        kernel: kernel type
+        system: system name
+        hostname: host name
+    
+    在里面, 通过 api_request 发送 客户端注册请求 
+      (其中 api_request 计算 URL 的算法很奇怪 )
+    返回一段 json
+    {
+        "response": "ok",
+        "host": {
+          "key": key  // 真正需要的是 key
+        }
+    }
+    
+    此数据会保存到配置文件的 agent-key
+    
+5   follower 关注某个日志文件
+    
+    在 
+   
+6   监控全局   
+    
+    - le 的配置文件可以存放 在服务器端, 服务器端期望返回的数据格式为
+      {
+        "response": "ok"
+        "list": [
+            {
+                "follow": xxxx
+            }
+        ]
+      }
+      在实际世界, 一个被监控的文件需要注意:  
+      
+    - 默认日志的读取间隔为 0.6s , 并且为写死
+    
+    

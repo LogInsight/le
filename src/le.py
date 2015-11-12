@@ -2529,6 +2529,10 @@ def create_host(name, hostname, system, distname, distver):
         'distname': distname,
         'distver': distver
     }
+    return {
+        'key': 'debug_host_key'         # hacking api server's protocol --loginsight
+    }
+
     resp = api_request(request, True, True)
     if resp['response'] == 'ok':
         return resp['host']
