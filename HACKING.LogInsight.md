@@ -81,11 +81,14 @@ metrics-cpu = system
     
 5   follower 关注某个日志文件
     
-    在 
+    （需要注册文件到服务器上）
    
 6   监控全局   
     
     - le 的配置文件可以存放 在服务器端, 服务器端期望返回的数据格式为
+      读取的 url 为 /hosts/<agent_key>
+      {'type': 'token', 'name': cl.name, 'filename': cl.path, 'key': '', 'token': cl.token,
+                     'formatter': cl.formatter, 'entry_identifier': cl.entry_identifier, 'follow': 'true'})
       {
         "response": "ok"
         "list": [
@@ -97,5 +100,20 @@ metrics-cpu = system
       在实际世界, 一个被监控的文件需要注意:  
       
     - 默认日志的读取间隔为 0.6s , 并且为写死
+    - 使用 HTTP 协议传输数据 具体的 URL 地址为
+       'PUT /%s/hosts/%s/%s/?realtime=1 HTTP/1.0\r\n\r\n' % (
+                    config.user_key, config.agent_key, log_key)
+        其中, log_key 为服务器端返回的，为了追踪本次日志数据而生产的 key 
+    - 数据传输涉及的类主要是 Transport Follower
+      其中有关数据读取的代码在 Follower
+      1. 列出全部符合 name 表达式的 文件，去最近更新的。
+      2. 打开之， 如果不行 1s 后再试
+      3. 读取日志文件的每一行，进行 filter & formater ，传入  Transport
+      4. Transport 送入一个 queue, SEND_QUEUE_SIZE  
+          # Maximal queue size for events sent
+            SEND_QUEUE_SIZE = 32000
+           这个设定看起来是 per_file ，当开启为 data_hub 时，为全局复用
+      
+
     
     
